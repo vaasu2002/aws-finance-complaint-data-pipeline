@@ -68,3 +68,30 @@ else:
     
     new_sparkdf=df_sparkdf.coalesce(10)
 
+logger.info(f"Converting spark dataframe to DynamicFrame")
+
+newDynamicFrame= DynamicFrame.fromDF(new_sparkdf, glueContext, "new_sparkdf")
+
+logger.info(f"Started writing new records into dynamo db dataframe.")
+
+logger.info(f"Number of records will be written to dynamodb: {new_sparkdf.count()}")
+
+glueContext.write_dynamic_frame_from_options(
+    frame=newDynamicFrame,
+    connection_type="dynamodb",
+    connection_options={"dynamodb.output.tableName": DYNAMODB_TABLE_NAME,
+        "dynamodb.throughput.write.percent": "1.0"
+    }
+)
+
+logger.info(f"Data has been dumped into dynamodb ")
+
+logger.info(f"Archiving file from inbox source: s3://{BUCKET_NAME}/inbox  to archive: s3://{BUCKET_NAME}/archive ")
+
+os.system(f"aws s3 sync s3://{BUCKET_NAME}/inbox s3://{BUCKET_NAME}/archive")
+
+logger.info(f"File is successfully archived.")
+
+os.system(f"aws s3 rm s3://{BUCKET_NAME}/inbox/ --recursive")
+    
+job.commit()
