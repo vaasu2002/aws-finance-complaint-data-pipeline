@@ -1,6 +1,6 @@
 
 ## **Steps to make lambda function**
-The code `lambda_function.py` is inside `lambda_function_code` folder
+The code [lambda_function.py](./lambda_function_code/lambda_function.py) is inside [lambda_function_code](./lambda_function_code) folder
 #### **1)** Creating conda environment
 ```bash
 conda create -p env python==3.9 -y
